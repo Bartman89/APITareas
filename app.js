@@ -10,56 +10,43 @@ const tareas = [
     { id: "2", titulo: "Titulo 2", descripcion: "Descripcion 2", isComplete: false }
 ];
 
-// Obtener todas las tareas
 app.get('/tareas', (req, res) => {
   res.json(tareas);
 });
 
-// Obtener una tarea por ID
-app.get('/tareas/:id', (req, res) => {
-  const id = parseInt(req.params.id);  // Convierte el parámetro ID a número
-  const tarea = tareas.find(t => t.id === id);  // Busca la tarea por ID
-
-  if (tarea) {
-    res.json(tarea);  // Responde con la tarea encontrada
-  } else {
-    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });
-  }
-});
-
-// Crear una nueva tarea
 app.post('/tareas', (req, res) => {
-  const nuevaTarea = req.body;
-  nuevaTarea.id = Date.now();  // Genera un ID único para la nueva tarea
-  tareas.push(nuevaTarea);  // Añade la nueva tarea al array de tareas
-  res.status(201).json(nuevaTarea);
+  const nuevaTarea = req.body; // Obtiene los datos del Tarea del cuerpo de la solicitud
+  //nuevaTarea.id = Date.now().toString(); // Genera un id único para el nuevo Tarea
+  tareas.push(nuevaTarea); // Añade el nuevo Tarea al array de tareas
+  res.status(201).json(nuevaTarea); // Responde con el Tarea creado y el código 201 (Creado)
 });
 
-// Actualizar una tarea por ID
 app.put('/tareas/:id', (req, res) => {
-  const id = parseInt(req.params.id);  // Convierte el ID a número
-  const tareaActualizada = req.body;  // Obtiene los datos actualizados
+  const { id } = req.params;  // Obtiene el ID del Tarea desde la URL
+  const tareaActualizada = req.body;  // Obtiene los datos actualizados del cuerpo de la solicitud
 
-  const indice = tareas.findIndex(t => t.id === id);
+  // Encuentra el Tarea en el array por su ID
+  const indice = tareas.findIndex(Tarea => Tarea.id === id);
 
   if (indice !== -1) {
-    tareas[indice] = { ...tareas[indice], ...tareaActualizada };  // Actualiza la tarea
-    res.status(200).json(tareas[indice]);  // Responde con la tarea actualizada
+    tareas[indice] = { ...tareas[indice], ...tareaActualizada };  // Actualiza los datos del Tarea
+    res.status(200).json(tareas[indice]);  // Responde con el Tarea actualizado
   } else {
-    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });
+    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });  // Responde con un error si el Tarea no existe
   }
 });
 
-// Eliminar una tarea por ID
 app.delete('/tareas/:id', (req, res) => {
-  const id = parseInt(req.params.id);  // Convierte el ID a número
-  const indice = tareas.findIndex(t => t.id === id);
+  const { id } = req.params;  // Obtiene el ID del Tarea desde la URL
+
+  // Encuentra el índice del Tarea en el array por su ID
+  const indice = tareas.findIndex(Tarea => Tarea.id === id);
 
   if (indice !== -1) {
-    const tareaEliminada = tareas.splice(indice, 1);  // Elimina la tarea del array
-    res.status(200).json({ mensaje: `Tarea con id ${id} eliminada`, tarea: tareaEliminada });
+    const TareaEliminado = tareas.splice(indice, 1);  // Elimina el Tarea del array
+    res.status(200).json({ mensaje: `Tarea con id ${id} eliminado`, Tarea: TareaEliminado });
   } else {
-    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });
+    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });  // Responde con un error si el Tarea no existe
   }
 });
 
