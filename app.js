@@ -3,63 +3,63 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors()); // Permite solicitudes desde cualquier origen
-
-// Middleware para manejar el cuerpo de las solicitudes en formato JSON
 app.use(express.json());
 
 const tareas = [
-    {
-        id:1,    
-        titulo:"Titulo 1",
-        descripcion:"Descripcion 1",
-        isComplete:true
-    },
+    { id: "1", titulo: "Titulo 1", descripcion: "Descripcion 1", isComplete: true },
+    { id: "2", titulo: "Titulo 2", descripcion: "Descripcion 2", isComplete: false }
+];
 
-    {
-        id:2,
-        titulo:"Titulo 2",
-        descripcion:"Descripcion 2",
-        isComplete:false
-    }
- ]   ;
-
+// Obtener todas las tareas
 app.get('/tareas', (req, res) => {
   res.json(tareas);
 });
 
-app.post('/tareas', (req, res) => {
-  const nuevaTarea = req.body; // Obtiene los datos del equipo del cuerpo de la solicitud
-  //nuevoEquipo.id = Date.now().toString(); // Genera un id único para el nuevo equipo
-  tareas.push(nuevaTarea); // Añade el nuevo equipo al array de equipos
-  res.status(201).json(nuevaTarea); // Responde con el equipo creado y el código 201 (Creado)
-});
+// Obtener una tarea por ID
+app.get('/tareas/:id', (req, res) => {
+  const id = parseInt(req.params.id);  // Convierte el parámetro ID a número
+  const tarea = tareas.find(t => t.id === id);  // Busca la tarea por ID
 
-app.put('/tareas/:id', (req, res) => {
-  const { id } = req.params;  // Obtiene el ID del equipo desde la URL
-  const tareaActualizada = req.body;  // Obtiene los datos actualizados del cuerpo de la solicitud
-
-  // Encuentra el equipo en el array por su ID
-  const indice = equipos.findIndex(equipo => equipo.id === id);
-
-  if (indice !== -1) {
-    tareas[indice] = { ...tareas[indice], ...tareaActualizada };  // Actualiza los datos del equipo
-    res.status(200).json(tareas[indice]);  // Responde con el equipo actualizado
+  if (tarea) {
+    res.json(tarea);  // Responde con la tarea encontrada
   } else {
-    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });  // Responde con un error si el equipo no existe
+    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });
   }
 });
 
-app.delete('/tareas/:id', (req, res) => {
-  const { id } = req.params;  // Obtiene el ID del equipo desde la URL
+// Crear una nueva tarea
+app.post('/tareas', (req, res) => {
+  const nuevaTarea = req.body;
+  nuevaTarea.id = Date.now();  // Genera un ID único para la nueva tarea
+  tareas.push(nuevaTarea);  // Añade la nueva tarea al array de tareas
+  res.status(201).json(nuevaTarea);
+});
 
-  // Encuentra el índice del equipo en el array por su ID
-  const indice = tareas.findIndex(tarea => tarea.id === id);
+// Actualizar una tarea por ID
+app.put('/tareas/:id', (req, res) => {
+  const id = parseInt(req.params.id);  // Convierte el ID a número
+  const tareaActualizada = req.body;  // Obtiene los datos actualizados
+
+  const indice = tareas.findIndex(t => t.id === id);
 
   if (indice !== -1) {
-    const tareaEliminada = tareas.splice(indice, 1);  // Elimina el equipo del array
-    res.status(200).json({ mensaje: `Tarea con id ${id} eliminada`, equipo: equipoEliminado });
+    tareas[indice] = { ...tareas[indice], ...tareaActualizada };  // Actualiza la tarea
+    res.status(200).json(tareas[indice]);  // Responde con la tarea actualizada
   } else {
-    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });  // Responde con un error si el equipo no existe
+    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });
+  }
+});
+
+// Eliminar una tarea por ID
+app.delete('/tareas/:id', (req, res) => {
+  const id = parseInt(req.params.id);  // Convierte el ID a número
+  const indice = tareas.findIndex(t => t.id === id);
+
+  if (indice !== -1) {
+    const tareaEliminada = tareas.splice(indice, 1);  // Elimina la tarea del array
+    res.status(200).json({ mensaje: `Tarea con id ${id} eliminada`, tarea: tareaEliminada });
+  } else {
+    res.status(404).json({ error: `Tarea con id ${id} no encontrada` });
   }
 });
 
